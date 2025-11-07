@@ -1,0 +1,294 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code when working in this project.
+
+## Project Overview
+
+**Project Name:** {project_name}
+**Project Type:** {project_type}
+**Tech Stack:** {tech_stack}
+
+This project uses the **BMAD Method** for structured, AI-assisted development.
+
+## Development Workflow
+
+### Phase 4: Implementation (Current Phase)
+
+You are in the **Implementation Phase** where stories are developed using Test-Driven Development.
+
+#### Story Lifecycle
+
+1. **Create Story** → Extract from epic, prepare for development
+2. **Generate Context** → Scan codebase, create `.context.xml`
+3. **Start Development** → Plan Mode + TDD implementation
+4. **Code Review** → Systematic validation
+5. **Mark Done** → Complete and advance to next story
+
+#### Available Skills
+
+Use these conversational triggers:
+- **"what's next"** - Get navigation guidance
+- **"create story"** - Create next story from epic
+- **"generate context"** - Prepare story for development
+- **"start development"** - Begin TDD implementation
+- **"run review"** - Validate implementation
+- **"mark done"** - Complete story
+- **"project status"** - View sprint progress
+
+---
+
+## Test-Driven Development (TDD) Rules
+
+**CRITICAL: TDD enforcement is active via hooks. You MUST follow this workflow:**
+
+### Phase 1: Test Writing
+
+- **Write ALL tests FIRST** before any implementation
+- Tests must **FAIL** initially (no implementation exists)
+- Implementation code is **BLOCKED** by hooks during this phase
+
+**Test file patterns:**
+- Jest/Vitest/Bun: `*.test.ts`, `*.spec.ts`
+- pytest: `test_*.py`, `*_test.py`
+- Go: `*_test.go`
+- Rust: `*_test.rs`
+
+**Commands:**
+```bash
+# Initialize TDD for a story
+node .claude/hooks/tdd-manager.js init {story-key}
+
+# After all tests written and failing
+node .claude/hooks/tdd-manager.js switch-to-implementation
+```
+
+### Phase 2: Implementation
+
+- **Write implementation** to make tests pass
+- Test files are **LOCKED** (modifications blocked by hooks)
+- Tests must **PASS** after implementation
+
+**DO NOT:**
+- Write implementation before tests exist
+- Modify tests during implementation phase
+- Skip test validation
+
+### Phase 3: Review
+
+```bash
+# Switch to review phase
+node .claude/hooks/tdd-manager.js switch-to-review
+```
+
+### Reset After Story Complete
+
+```bash
+# Reset TDD state when story done
+node .claude/hooks/tdd-manager.js reset
+```
+
+---
+
+## Current Story Context
+
+<!-- STORY_CONTEXT_START -->
+**No active story**
+
+Use the "start development" skill to begin implementing a story.
+When development starts, current story details will appear here automatically.
+<!-- STORY_CONTEXT_END -->
+
+---
+
+## Project-Specific Conventions
+
+### Code Style
+{code_style_conventions}
+
+### Testing Standards
+{testing_standards}
+
+### Architecture Patterns
+{architecture_patterns}
+
+### Error Handling
+{error_handling_conventions}
+
+### Security Requirements
+{security_requirements}
+
+---
+
+## File Organization
+
+```
+{project_root}/
+├── docs/
+│   ├── sprint-status.yaml       # Story queue and progress
+│   ├── epics/                   # Epic breakdown
+│   │   ├── epic-1.md
+│   │   ├── epic-2.md
+│   │   └── ...
+│   ├── stories/                 # Story implementation context
+│   │   ├── {story-key}.md      # Story details (optional)
+│   │   └── {story-key}.context.xml  # Pre-processed context
+│   └── plans/                   # Approved TDD plans
+│       └── {story-key}.plan.md
+├── src/                         # Source code
+├── test/                        # Test files
+└── .claude/
+    ├── hooks/                   # TDD enforcement
+    ├── skills/                  # User-facing commands
+    └── agents/                  # Heavy processing agents
+```
+
+---
+
+## Common Development Tasks
+
+### Starting a New Story
+
+```
+User: "what's next"
+You: [Check sprint-status.yaml, suggest next action]
+
+User: "create next story"
+You: [Invoke create-story workflow, update status]
+
+User: "generate context"
+You: [Launch story-context agent, scan codebase]
+
+User: "start development"
+You: [Enter Plan Mode, do Q&A, build TDD plan, implement interactively]
+```
+
+### Implementation Session
+
+- **Stay interactive** - Ask questions, show progress, allow course corrections
+- **Use Plan Mode** - Start with planning, get approval, then execute
+- **Use TodoWrite** - Track progress with Claude's native todo system
+- **Follow TDD** - Tests first (fail), then implementation (pass)
+- **Run tests frequently** - Validate as you go
+
+### Code Review
+
+```
+User: "run review"
+You: [Launch code-review agent, validate ACs, security, tests]
+
+Outcomes:
+- APPROVE + HIGH confidence → Auto-approve, suggest "mark done"
+- APPROVE + MEDIUM/LOW → Manual confirmation needed
+- CHANGES REQUESTED → Add todos, suggest "continue development"
+- BLOCKED → Critical issues, halt until fixed
+```
+
+### Completing a Story
+
+```
+User: "mark done"
+You: [Invoke story-done workflow, reset TDD, suggest next story]
+```
+
+---
+
+## Epic References
+
+Stories reference epic sections directly (no duplication):
+
+**Example:**
+```yaml
+# sprint-status.yaml
+development_status:
+  2-3-user-auth:
+    epic_ref: "epics/epic-2.md#story-2-3"
+    status: ready-for-dev
+    context_file: "stories/2-3-user-auth.context.xml"
+```
+
+When implementing a story:
+1. Load epic section from reference
+2. Load `.context.xml` (pre-processed codebase context)
+3. Implement with TDD
+4. Review validates against ACs from epic
+
+**Token Efficiency:** ~70-95% reduction vs duplicating story details
+
+---
+
+## Important Reminders
+
+### Interactive Development
+- You work **in the main context** during implementation
+- User sees everything you do in real-time
+- User can interrupt, ask questions, course-correct anytime
+- This is **collaborative**, not autonomous
+
+### TDD Discipline
+- Hooks enforce test-first workflow
+- If blocked, check TDD phase: `node .claude/hooks/tdd-manager.js status`
+- Never fight the hooks - they prevent common mistakes
+
+### Context Management
+- **Skills** run in main context (light operations)
+- **Agents** run in separate contexts (heavy scanning/review)
+- **Context files** (.context.xml) provide focused information
+- **Epic references** eliminate duplication
+
+### Sprint Progress
+- `sprint-status.yaml` is single source of truth
+- Always preserve file structure and comments when updating
+- One story at a time (sequential dependencies)
+- Retrospectives after epic completion
+
+---
+
+## Getting Help
+
+### Check Status
+```
+"what should I do"
+"project status"
+"show progress"
+```
+
+### TDD Issues
+```bash
+# Check current TDD phase
+node .claude/hooks/tdd-manager.js status
+
+# Reset if stuck
+node .claude/hooks/tdd-manager.js reset
+```
+
+### Review Sprint Progress
+```
+"project status"  # Full overview
+"what's next"     # Current story and next action
+```
+
+### BMAD Documentation
+See `docs/` directory for:
+- PRD (Product Requirements)
+- Architecture decisions
+- Epic breakdowns
+- Story details
+- Tech specs
+
+---
+
+## Auto-Generated Sections
+
+The following sections are auto-updated by BMAD workflows:
+
+### Current Story Context
+<!-- Updated by start-dev skill when story begins -->
+
+### Project Metadata
+- Last updated: {timestamp}
+- BMAD Version: {bmad_version}
+- Phase: 4 (Implementation)
+
+---
+
+**Remember:** BMAD emphasizes structured planning (Phases 1-3) followed by efficient, test-driven implementation (Phase 4). The heavy lifting of context gathering is done once per story, allowing you to focus on interactive, collaborative development with the user.
